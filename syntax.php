@@ -1,20 +1,30 @@
 <?php
-class syntax_plugin_anchor extends DokuWiki_Syntax_Plugin
-{
-	function getType() {return 'substition';}
-	function getPType() {return 'block';}
-	function getSort() {return 167;}
+class syntax_plugin_anchor extends DokuWiki_Syntax_Plugin {
 
-	function connectTo($mode){
+    CONST PREG_PATTERN = "/^\{\{anchor:(.*):(.*)}}$/ui";
+
+    function getType() {
+        return 'substition';
+    }
+
+	function getPType() {
+        return 'normal';
+    }
+	function getSort() {
+        return 167;
+    }
+
+	function connectTo($mode) {
 		$this->Lexer->addSpecialPattern('\{\{anchor:[^}]*\}\}', $mode, 'plugin_anchor');
 	}
 
 	function handle($match, $state, $pos, Doku_Handler $handler) {
-		return explode(':', substr($match, strlen('{{anchor:'), -2));
+        preg_match(self::PREG_PATTERN, $match, $result);
+		return $result;
 	}
 
-	function render($mode, Doku_Renderer $renderer, $data) {
-		$content = array_key_exists(1, $data) ? $data[1] : '';
-		$renderer->doc .= '<a name="' . $data[0] . '">' . $content . '</a>';
+	function render($format, Doku_Renderer $renderer, $data) {
+        list(/* $rawContent */, $id, $content) = $data; // blame php 5... I want use new syntax list [$rawContent, $id, $content]
+		$renderer->doc .= '<a id="' . $id. '">' . $content . '</a>';
 	}
 }
