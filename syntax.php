@@ -4,6 +4,8 @@ class syntax_plugin_anchor extends DokuWiki_Syntax_Plugin {
 
     CONST PREG_PATTERN = "/^\{\{anchor:(.*):(.*)}}$/ui";
 
+    const DATA_COUNT = 3;
+
     function getType() {
         return 'substition';
     }
@@ -26,6 +28,11 @@ class syntax_plugin_anchor extends DokuWiki_Syntax_Plugin {
     }
 
     function render($format, Doku_Renderer $renderer, $data) {
+        if(count($data) != self::DATA_COUNT) {
+            $renderer->doc .= "|| ERROR (plugin anchor) :: Bad content!<br>";
+            $renderer->doc .= "|| Usage: {{anchor:tag:content}}<br>";
+            return;
+        }
         list(/* $raw */, $id, $content) = $data;
         $renderer->doc .= '<a id="' . $id. '">' . $content . '</a>';
     }
